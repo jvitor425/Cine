@@ -135,6 +135,10 @@ npm install
 
 ### Executar a Aplicação
 O servidor dev Vite já está rodando neste ambiente. A aplicação está acessível através do painel de preview.
+```bash
+#
+npm run dev
+```
 
 ## 📝 Como Testar
 
@@ -291,4 +295,12 @@ Esta implementação satisfaz completamente todos os requisitos do teste técnic
 Cada funcionalidade funciona de ponta a ponta. A aplicação está pronta para avaliação.
 
 <img width="1900" height="796" alt="Captura de Tela (4)" src="https://github.com/user-attachments/assets/5293c49a-d2c0-4884-add5-4aecdb3184a3" />
+<img width="1920" height="848" alt="Captura de Tela (5)" src="https://github.com/user-attachments/assets/6afb7ee0-ab46-4de5-abe1-6a1008b42abf" />
+<img width="1920" height="884" alt="Captura de Tela (6)" src="https://github.com/user-attachments/assets/65921d06-0041-4f17-8431-d223e8a5c838" />
+<img width="1910" height="806" alt="Captura de Tela (7)" src="https://github.com/user-attachments/assets/97c67927-bc61-45e6-be8e-eb356f2fd673" />
+<img width="1920" height="865" alt="Captura de Tela (8)" src="https://github.com/user-attachments/assets/a9ebb6ad-2fe9-48b2-91f5-e00cf5c35a4f" />
+
+
+
+
 
