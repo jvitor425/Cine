@@ -289,3 +289,6 @@ Esta implementação satisfaz completamente todos os requisitos do teste técnic
 - Código limpo, mantível e pronto para produção
 
 Cada funcionalidade funciona de ponta a ponta. A aplicação está pronta para avaliação.
+
+<img width="1900" height="796" alt="Captura de Tela (4)" src="https://github.com/user-attachments/assets/5293c49a-d2c0-4884-add5-4aecdb3184a3" />
+
