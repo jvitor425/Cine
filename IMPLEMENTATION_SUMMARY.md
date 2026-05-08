@@ -244,7 +244,6 @@ Todas as páginas e funcionalidades são:
 ## Sem funcionalidades incompletas ✅
 
 Todas as funcionalidades mencionadas nos requisitos foram totalmente implementadas:
-- Sem comentários "TODO"
 - Sem funções provisórias
 - Sem funcionalidades desabilitadas
 - Sem implementações parciais
