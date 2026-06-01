@@ -1,90 +1,81 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { firebaseAuth } from '../firebase/firebase.config';
+import { authService } from '../services/auth.service';
+import { userService } from '../services/user.service';
+import type { IAuthContext, RegisterData } from '../interfaces/auth.interface';
+import type { UserType } from '../types/user.type';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const profile = await userService.getUser(firebaseUser.uid);
+          setUser(
+            profile ?? {
+              id: firebaseUser.uid,
+              name:
+                firebaseUser.displayName ||
+                firebaseUser.email?.split('@')[0] ||
+                'Usuário',
+              email: firebaseUser.email!,
+              createdAt:
+                firebaseUser.metadata.creationTime || new Date().toISOString(),
+            }
+          );
+        } catch {
+          setUser({
+            id: firebaseUser.uid,
+            name:
+              firebaseUser.displayName ||
+              firebaseUser.email?.split('@')[0] ||
+              'Usuário',
+            email: firebaseUser.email!,
+            createdAt:
+              firebaseUser.metadata.creationTime || new Date().toISOString(),
+          });
+        }
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
+    return unsubscribe;
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const foundUser = users.find((u: any) => u.email === email && u.password === password);
-
-    if (!foundUser) {
-      throw new Error('Credenciais inválidas');
-    }
-
-    const mockToken = btoa(`${email}:${Date.now()}`);
-    const userData = { id: foundUser.id, name: foundUser.name, email: foundUser.email };
-
-    localStorage.setItem('token', mockToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    setToken(mockToken);
-    setUser(userData);
+  const login = async (email: string, password: string): Promise<void> => {
+    await authService.login(email, password);
   };
 
-  const register = async (name: string, email: string, password: string) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-    if (users.find((u: any) => u.email === email)) {
-      throw new Error('E-mail já cadastrado');
-    }
-
-    const newUser = {
-      id: Date.now().toString(),
-      name,
-      email,
-      password
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    await login(email, password);
+  const register = async (data: RegisterData): Promise<void> => {
+    await authService.register(data);
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
-    setUser(null);
+  const logout = async (): Promise<void> => {
+    await authService.logout();
+  };
+
+  const resetPassword = async (email: string): Promise<void> => {
+    await authService.resetPassword(email);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        token,
+        loading,
+        isAuthenticated: !!user,
         login,
         register,
         logout,
-        isAuthenticated: !!token
+        resetPassword,
       }}
     >
       {children}
@@ -92,10 +83,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
+export function useAuth(): IAuthContext {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error('useAuth deve ser usado dentro de AuthProvider');
   }
   return context;
 }
+
