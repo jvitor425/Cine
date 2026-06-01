@@ -22,13 +22,13 @@ class UserService implements IUserService {
       name: data.name,
       email: data.email,
       createdAt: new Date().toISOString(),
-    };
-    await setDoc(doc(firestoreDb, USERS_COLLECTION, data.id), userData); // CORRIGIDO AQUI
+    
+    await setDoc(doc(firestoreDb, USERS_COLLECTION, data.id), userData); 
     return userData;
   }
 
   async getUser(id: string): Promise<UserType | null> {
-    const docRef = doc(firestoreDb, USERS_COLLECTION, id); // CORRIGIDO AQUI
+    const docRef = doc(firestoreDb, USERS_COLLECTION, id); 
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) return null;
     return docSnap.data() as UserType;
@@ -57,7 +57,7 @@ class UserService implements IUserService {
   }
 
   async deleteUser(id: string): Promise<void> {
-    await deleteDoc(doc(firestoreDb, USERS_COLLECTION, id)); // CORRIGIDO AQUI
+    await deleteDoc(doc(firestoreDb, USERS_COLLECTION, id)); 
   }
 }
 
